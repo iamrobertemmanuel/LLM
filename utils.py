@@ -8,18 +8,37 @@ import os
 import aiohttp
 import asyncio
 import time
+from typing import Dict, Any
 load_dotenv()
 
 
-def load_config(file_path = "config.yaml"):
-    with open(file_path, "r") as f:
-        return yaml.safe_load(f)
+def load_config() -> Dict[str, Any]:
+    """Load configuration from config.yaml or environment variable."""
+    # First try to load from environment variable (Replit)
+    config_yaml = os.getenv('CONFIG_YAML')
+    if config_yaml:
+        return yaml.safe_load(config_yaml)
     
+    # If not in environment, try to load from file
+    config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.yaml')
+    if os.path.exists(config_path):
+        with open(config_path, 'r') as f:
+            return yaml.safe_load(f)
+    
+    # If neither exists, try the example config
+    example_config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.yaml.example')
+    if os.path.exists(example_config_path):
+        with open(example_config_path, 'r') as f:
+            return yaml.safe_load(f)
+    
+    raise FileNotFoundError("No configuration file found")
+
 config = load_config()
 
 
-def convert_ns_to_seconds(ns_value):
-    return ns_value / 1_000_000_000 
+def convert_ns_to_seconds(ns: int) -> float:
+    """Convert nanoseconds to seconds."""
+    return ns / 1e9 
 
 def timeit(func):
     def wrapper(*args, **kwargs):
@@ -118,11 +137,14 @@ def list_ollama_models():
     models = [model["name"] for model in json_response["models"] if "embed" not in model["name"]]
     return models
     
-def convert_bytes_to_base64(image_bytes):
-    return base64.b64encode(image_bytes).decode("utf-8")
+def convert_bytes_to_base64(image_bytes: bytes) -> str:
+    """Convert bytes to base64 string."""
+    return base64.b64encode(image_bytes).decode('utf-8')
     
-def convert_bytes_to_base64_with_prefix(image_bytes):
-    return "data:image/jpeg;base64," + convert_bytes_to_base64(image_bytes)
+def convert_bytes_to_base64_with_prefix(image_bytes: bytes) -> str:
+    """Convert bytes to base64 string with data URL prefix."""
+    base64_str = convert_bytes_to_base64(image_bytes)
+    return f"data:image/jpeg;base64,{base64_str}"
 
 def get_timestamp():
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
