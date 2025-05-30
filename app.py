@@ -53,18 +53,60 @@ def clear_cache():
     st.cache_resource.clear()
 
 def list_model_options():
-    if st.session_state.endpoint_to_use == "ollama":
-        ollama_options = list_ollama_models()
-        if ollama_options == []:
-            st.warning("No ollama models available, please choose one from https://ollama.com/library and pull with /pull <model_name>")
-        return ollama_options
+    """List available model options based on selected endpoint."""
+    if "endpoint_to_use" not in st.session_state:
+        st.session_state.endpoint_to_use = "gemini"
+    
+    if st.session_state.endpoint_to_use == "gemini":
+        return ["gemini-2.0-flash"]
     elif st.session_state.endpoint_to_use == "openai":
         return list_openai_models()
+    elif st.session_state.endpoint_to_use == "ollama":
+        return list_ollama_models()
+    return []
 
 def update_model_options():
     st.session_state.model_options = list_model_options()
 
 def main():
+    st.set_page_config(
+        page_title="Local Multimodal AI Chat",
+        page_icon="🤖",
+        layout="wide",
+        initial_sidebar_state="expanded",
+    )
+
+    # Initialize session state
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+    
+    if "endpoint_to_use" not in st.session_state:
+        st.session_state.endpoint_to_use = "gemini"
+    
+    if "model_to_use" not in st.session_state:
+        st.session_state.model_to_use = "gemini-2.0-flash"
+
+    # Sidebar configuration
+    with st.sidebar:
+        st.title("Configuration")
+        
+        # Endpoint selection
+        endpoint_options = ["gemini"]  # Removed other options for Replit deployment
+        st.session_state.endpoint_to_use = st.selectbox(
+            "Select Endpoint",
+            endpoint_options,
+            index=endpoint_options.index(st.session_state.endpoint_to_use)
+        )
+        
+        # Model selection
+        st.session_state.model_options = list_model_options()
+        if st.session_state.model_options:
+            st.session_state.model_to_use = st.selectbox(
+                "Select Model",
+                st.session_state.model_options,
+                index=0
+            )
+
     st.title("Multimodal Local Chat App")
     st.write(css, unsafe_allow_html=True)
     
@@ -74,8 +116,6 @@ def main():
         st.session_state.session_index_tracker = "new_session"
         st.session_state.audio_uploader_key = 0
         st.session_state.pdf_uploader_key = 1
-        st.session_state.endpoint_to_use = "ollama"
-        st.session_state.model_options = list_model_options()
         st.session_state.model_tracker = None
 
     if st.session_state.session_key == "new_session" and st.session_state.new_session_key != None:
