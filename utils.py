@@ -131,11 +131,19 @@ def list_openai_models():
 
 
 def list_ollama_models():
-    json_response = requests.get(url = config["ollama"]["base_url"] + "/api/tags").json()
-    if json_response.get("error", False):
+    """List available Ollama models, returns empty list on Replit."""
+    # On Replit, we don't have Ollama access
+    if os.getenv('REPL_ID'):
         return []
-    models = [model["name"] for model in json_response["models"] if "embed" not in model["name"]]
-    return models
+    
+    try:
+        json_response = requests.get(url = config["ollama"]["base_url"] + "/api/tags").json()
+        if json_response.get("error", False):
+            return []
+        models = [model["name"] for model in json_response["models"] if "embed" not in model["name"]]
+        return models
+    except:
+        return []
     
 def convert_bytes_to_base64(image_bytes: bytes) -> str:
     """Convert bytes to base64 string."""
