@@ -27,7 +27,7 @@ from database_operations import (
     DEFAULT_CHUNK_SIZE,
     DEFAULT_CHUNK_OVERLAP
 )
-from utils import list_openai_models, list_ollama_models, command
+from utils import list_openai_models, command
 import sqlite3
 config = load_config()
 
@@ -61,8 +61,6 @@ def list_model_options():
         return ["gemini-2.0-flash"]
     elif st.session_state.endpoint_to_use == "openai":
         return list_openai_models()
-    elif st.session_state.endpoint_to_use == "ollama":
-        return list_ollama_models()
     return []
 
 def update_model_options():
@@ -91,7 +89,7 @@ def main():
         st.title("Configuration")
         
         # Endpoint selection
-        endpoint_options = ["gemini"]  # Removed other options for Replit deployment
+        endpoint_options = ["gemini"]  # Only Gemini for Replit deployment
         st.session_state.endpoint_to_use = st.selectbox(
             "Select Endpoint",
             endpoint_options,
@@ -141,7 +139,7 @@ def main():
     # Model Settings
     st.sidebar.subheader("Model Configuration")
     api_col, model_col = st.sidebar.columns(2)
-    api_col.selectbox(label="Select an API", options = ["ollama","openai"], key="endpoint_to_use", on_change=update_model_options)
+    api_col.selectbox(label="Select an API", options = ["gemini"], key="endpoint_to_use", on_change=update_model_options)
     model_col.selectbox(label="Select a Model", options = st.session_state.model_options, key="model_to_use")
     pdf_toggle_col, voice_rec_col = st.sidebar.columns(2)
     pdf_toggle_col.toggle("PDF Chat", key="pdf_chat", value=False, on_change=clear_cache)
