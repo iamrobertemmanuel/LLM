@@ -20,6 +20,7 @@ A versatile chat application that supports multiple AI models and multimodal int
 
 - Python 3.11 or later
 - Dependencies listed in requirements.txt
+- Google Gemini API key
 
 ## Setup
 
@@ -43,6 +44,24 @@ pip install -r requirements.txt
 4. Configure API keys:
    - Copy `config.yaml.example` to `config.yaml`
    - Add your API keys for the services you want to use
+
+   For Replit deployment:
+   - Add the following secrets in your Replit environment:
+     ```
+     GOOGLE_API_KEY=your_gemini_api_key_here
+     CONFIG_YAML="""
+     gemini:
+       api_key: "${GOOGLE_API_KEY}"
+       model: "gemini-2.0-flash"
+       vision_model: "gemini-2.0-flash"
+
+     chromadb:
+       chromadb_path: "chroma_db"
+       collection_name: "pdfs"
+
+     chat_sessions_database_path: "./chat_sessions/chat_sessions.db"
+     """
+     ```
 
 5. Run the application:
 ```bash
