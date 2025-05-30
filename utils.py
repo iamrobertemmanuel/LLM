@@ -5,8 +5,6 @@ import requests
 from dotenv import load_dotenv
 import streamlit as st
 import os
-import aiohttp
-import asyncio
 import time
 from typing import Dict, Any
 load_dotenv()
@@ -51,74 +49,11 @@ def timeit(func):
     return wrapper
 
 def command(user_input):
-    splitted_input = user_input.split(" ")
-    if splitted_input[0] == "/pull":
-        return pull_model_in_background(splitted_input[1])
-    elif splitted_input[0] == "/help":
-        return "Possible commands:\n- /pull <model_name>"
+    if user_input == "/help":
+        return "Possible commands:\n- /help"
     else:    
         return """Invalid command, please use one of the following:\n
-                    - /help\n
-                    - /pull <model_name>"""
-
-def pull_ollama_model(model_name):
-    json_response = requests.post(url = config["ollama"]["base_url"] + "/api/pull", json = {"model": model_name}).json()
-    print(json_response)
-    if "error" in json_response.keys():
-        return json_response["error"]["message"]
-    else:
-        st.session_state.model_options = list_ollama_models()
-        st.warning(f"Pulling {model_name} finished.")
-        return json_response
-
-async def pull_ollama_model_async(model_name, stream=True, retries=1):
-    url = config["ollama"]["base_url"] + "/api/pull"
-    json_data = {"model": model_name, "stream": stream}
-    
-    for attempt in range(retries):
-        try:
-            async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=1800)) as session:  # Increased timeout for model pulling
-                async with session.post(url, json=json_data) as response:
-                    if stream:
-                        # Handle streaming response
-                        async for chunk in response.content.iter_chunked(1024):
-                            if chunk:
-                                st.info(f"Received chunk: {chunk.decode('utf-8')}")
-                    else:
-                        json_response = await response.json()
-                        print(json_response)
-
-                        if json_response.get("error", False):
-                            return json_response["error"]
-                        else:
-                            st.session_state.model_options = list_ollama_models()
-                            return f"Pull of {model_name} finished."
-                    return "Pulled"
-        except asyncio.TimeoutError:
-            st.warning(f"Timeout on attempt {attempt + 1}. Retrying...")
-        except Exception as e:
-            st.error(f"Error: {str(e)}")
-            break  # Break on non-timeout errors
-    return f"Failed to pull {model_name} after {retries} attempts."
-
-# Function to trigger the async pull (can be run in the event loop)
-def pull_model_in_background(model_name, stream=False):
-    try:
-        # Check if there's already an event loop running
-        loop = asyncio.get_running_loop()
-    except RuntimeError:  # If no loop is running, start a new one
-        loop = None
-
-    #st.info(f"Pulling {model_name}...")
-
-    if loop and loop.is_running():
-        # If an event loop is already running, create a task for the async function
-        return asyncio.create_task(pull_ollama_model_async(model_name, stream=stream))
-    else:
-        # Otherwise, use asyncio.run() to run it synchronously
-        return asyncio.run(pull_ollama_model_async(model_name, stream=stream))
-
-
+                    - /help"""
 
 def list_openai_models():
     openai_api_key = os.getenv("OPENAI_API_KEY")
@@ -128,22 +63,6 @@ def list_openai_models():
         return []
     else:
         return [item["id"] for item in response["data"]]
-
-
-def list_ollama_models():
-    """List available Ollama models, returns empty list on Replit."""
-    # On Replit, we don't have Ollama access
-    if os.getenv('REPL_ID'):
-        return []
-    
-    try:
-        json_response = requests.get(url = config["ollama"]["base_url"] + "/api/tags").json()
-        if json_response.get("error", False):
-            return []
-        models = [model["name"] for model in json_response["models"] if "embed" not in model["name"]]
-        return models
-    except:
-        return []
     
 def convert_bytes_to_base64(image_bytes: bytes) -> str:
     """Convert bytes to base64 string."""
