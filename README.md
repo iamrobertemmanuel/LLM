@@ -1,102 +1,87 @@
 # Local Multimodal AI Chat
 
-A multimodal chat application that integrates various AI models to manage audio, images, and PDFs seamlessly within a single interface.
+A versatile chat application that supports multiple AI models and multimodal interactions. This application allows you to chat with different AI models including Google's Gemini, OpenAI's models, and Ollama's local models.
 
 ## Features
 
-- **Local Model Processing with Ollama**: Run local instances of AI models
-- **OpenAI API Integration**: Access to OpenAI's powerful models
-- **Audio Processing**: Voice messages with Whisper AI
-- **PDF Processing**: Chat with your PDFs using Chroma DB
-- **Image Understanding**: Process and discuss images using LLaVA
-- **Multi-Session Support**: Manage multiple chat sessions
-- **Authentication System**: Secure user authentication
+- Support for multiple AI providers:
+  - Google Gemini
+  - OpenAI
+  - Ollama (local models)
+- Multimodal capabilities:
+  - Text chat
+  - Image understanding
+  - PDF document analysis
+- Modern Streamlit interface
+- Chat history persistence
+- Document similarity search using ChromaDB
 
-## Quick Start
+## Requirements
 
-### Local Setup
+- Python 3.11 or later
+- Dependencies listed in requirements.txt
 
-1. **Install Ollama**
-   ```bash
-   # Visit https://ollama.com/download and install
-   ```
+## Setup
 
-2. **Clone the Repository**
-   ```bash
-   git clone https://github.com/yourusername/Local-Multimodal-AI-Chat.git
-   cd Local-Multimodal-AI-Chat
-   ```
+1. Clone the repository:
+```bash
+git clone https://github.com/iamrobertemmanuel/LLM.git
+cd LLM
+```
 
-3. **Create Virtual Environment**
-   ```bash
-   python -m venv venv
-   # On Windows:
-   venv\Scripts\activate
-   # On Linux/Mac:
-   source venv/bin/activate
-   ```
+2. Create and activate a virtual environment:
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: .\venv\Scripts\activate
+```
 
-4. **Install Requirements**
-   ```bash
-   pip install --upgrade pip
-   pip install -r requirements.txt
-   ```
+3. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
 
-5. **Configure the Application**
-   ```bash
-   cp config.yaml.example config.yaml
-   # Edit config.yaml with your settings
-   ```
+4. Configure API keys:
+   - Copy `config.yaml.example` to `config.yaml`
+   - Add your API keys for the services you want to use
 
-6. **Initialize Database**
-   ```bash
-   python database_operations.py
-   ```
-
-7. **Run the Application**
-   ```bash
-   streamlit run app.py
-   ```
-
-### Replit Setup
-
-1. Fork this repository to your GitHub account
-2. Create a new Repl on Replit
-3. Import from your GitHub repository
-4. The included `.replit` and `replit.nix` files will handle the setup
-5. Add your configuration in Replit's Secrets:
-   - Add `CONFIG_YAML` secret with your configuration
-
-## Required Models
-
-Visit https://ollama.com/library to choose your models. Required models:
-- An embedding model (e.g., nomic-embed-text)
-- An image-capable model (e.g., llava)
-
-Pull models using the chat command: `/pull MODEL_NAME`
+5. Run the application:
+```bash
+streamlit run app.py
+```
 
 ## Configuration
 
-Create a `config.yaml` file based on `config.yaml.example`:
+The application uses a `config.yaml` file for configuration. Example structure:
+
 ```yaml
-openai:
-  api_key: "your-api-key-here"
+gemini:
+  api_key: "your-gemini-api-key"
+  model: "gemini-2.0-flash"
+  vision_model: "gemini-2.0-flash"
+
 ollama:
-  host: "http://localhost:11434"
-chat_icons:
-  user: "chat_icons/user_image.png"
-  bot: "chat_icons/bot_image.png"
+  embedding_model: "nomic-embed-text"
+  base_url: http://localhost:11434
+
+chromadb:
+  chromadb_path: "chroma_db"
+  collection_name: "pdfs"
+
+chat_sessions_database_path: "./chat_sessions/chat_sessions.db"
 ```
 
-## Contributing
+## Usage
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+1. Start the application using `streamlit run app.py`
+2. Select your preferred AI provider from the sidebar
+3. Choose the appropriate model
+4. Start chatting!
+
+### Features:
+- Text chat: Simply type your message and press enter
+- Image analysis: Upload an image to discuss it with the AI
+- PDF analysis: Upload PDF documents to chat about their contents
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0 - see the LICENSE file for details.
-
-## Contact
-
-- Email: leonsander.consulting@gmail.com
-- Twitter: [@leonsanderai](https://twitter.com/leonsanderai)
+MIT License
