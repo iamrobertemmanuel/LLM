@@ -1,0 +1,12 @@
+# OpenAI API Configuration
+openai:
+  api_key: "your-api-key-here"
+
+# Ollama Configuration
+ollama:
+  host: "http://localhost:11434"  # Default Ollama host
+
+# Chat Icons Configuration
+chat_icons:
+  user: "chat_icons/user_image.png"  # Path to user icon
+  bot: "chat_icons/bot_image.png"    # Path to bot icon 
